@@ -1,14 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:new_flutter_app/readData.dart';
+import 'package:new_flutter_app/screens/add_event.dart';
 import 'package:new_flutter_app/screens/main_tab.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
-
-import 'core/data/event_provider.dart';
 import 'core/provider/AppLanguageProvider.dart';
 import 'core/provider/AppThemeProvider.dart';
-import 'core/provider/event_provider.dart';
 import 'core/utiles/app_theme.dart';
-void main() {
+
+
+
+
+
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   runApp(
 
@@ -16,7 +25,6 @@ void main() {
     providers: [
       ChangeNotifierProvider(create: (context)=>AppLanguageProvider(),),
       ChangeNotifierProvider(create: (context)=>AppThemeProvider(),),
-      ChangeNotifierProvider(create: (context) => EventProvider()),
     ],
     child: MyApp(),
 
@@ -45,9 +53,14 @@ class MyApp extends StatelessWidget {
       darkTheme: AppTheme.darkTheme,
       initialRoute: '/',
       routes: {
-        '/':(context)=>maintab(),
+        '/':(context)=>   maintab(),
+
+        // GetUsersPage(),
+        // '/login':(context)=>login(),
+        // '/addevent':(context)=>AddEventPage(),
       },
    );
   }
 }
+
 

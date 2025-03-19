@@ -22,9 +22,13 @@
   "eventDate": "Event Date",
   "addEvent": "Add Event",
   "enterEventTitle": "Enter Event Title",
-  "enterEventNote": "Enter Event Note",
+  "enterEventNote": "Enter Event Description",
   "dateIsRequired": "Date is required",
   "titleIsRequired": "Title is required",
-  "noteIsRequired": "Note is required"
+  "noteIsRequired": "Description is required",
+   "eventTime":"Event Time",
+   "noFavoriteEvents":"No Favorite Events",
+   "added_to_favorites": "You have added to favorites",
+   "removed_from_favorites": "You have removed from favorites"
 
 }

@@ -22,8 +22,12 @@
   "eventDate": "تاريخ المناسبة",
   "addEvent": "إضافة المناسبة",
   "enterEventTitle": "أدخل عنوان المناسبة",
-  "enterEventNote": "أدخل ملاحظة المناسبة",
+  "enterEventNote": "أدخل وصف المناسبة",
   "dateIsRequired": "التاريخ مطلوب",
   "titleIsRequired": "العنوان مطلوب",
-  "noteIsRequired": "الملاحظة مطلوبة"
+  "noteIsRequired": "الوصف مطلوبة",
+  "eventTime":"وقت المناسبة ",
+  "noFavoriteEvents": "لا يوجد احداث في المفضلة",
+  "added_to_favorites": "لقد قمت بإضافة إلى المفضلة",
+  "removed_from_favorites": "لقد قمت بإزالة من المفضلة"
 }

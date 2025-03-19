@@ -1,13 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:new_flutter_app/core/utiles/app_colors.dart';
+import 'package:new_flutter_app/core/utiles/firebase_utils.dart';
 import 'package:new_flutter_app/core/widget/item_event_widget.dart';
 import 'package:new_flutter_app/core/widget/tab_event_widget.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/data/event_model.dart';
-import '../../core/data/event_provider.dart';
 import '../../core/provider/AppLanguageProvider.dart';
 
 class hometap extends StatefulWidget{
@@ -16,11 +17,49 @@ class hometap extends StatefulWidget{
 }
 
 class _homeState extends State<hometap> {
-  int selectedIndex=0;
 
+  int selectedIndex=0;
+  List eventList=[];
+  List filteredEventList=[];
+
+  void filterEvents() {
+    List <String> eventTitleList = [
+      "All",
+      "Sport",
+      "Birthday",
+      "Gaming",
+      "Meeting",
+      "Workshop",
+    ];
+    if (selectedIndex == 0) {
+      filteredEventList = List.from(eventList);
+    } else {
+      String selectedEventName = eventTitleList[selectedIndex];
+      filteredEventList = eventList.where((event) => event.eventName == selectedEventName).toList();
+    }
+    setState(() {
+
+    });
+  }
+
+  void getEvent() async{
+QuerySnapshot<EventModel> events=await firebaseUtiles.getEventCollection().get();
+eventList=events.docs.map((doc){
+
+
+  return doc.data();
+}).toList();
+filterEvents();
+    setState(() {
+    });
+  }
+  @override
+  void initState() {
+    super.initState();
+    getEvent();
+  }
   @override
   Widget build(BuildContext context) {
-    var events = Provider.of<EventProvider>(context).events;
 
     var languageProvider = Provider.of<AppLanguageProvider>(context);
     List<String> eventTitleList = [
@@ -31,6 +70,7 @@ class _homeState extends State<hometap> {
       AppLocalizations.of(context)!.meeting,
       AppLocalizations.of(context)!.workshope,
     ];
+
 
 
     return Scaffold(
@@ -112,7 +152,7 @@ class _homeState extends State<hometap> {
 
                     labelPadding: EdgeInsets.symmetric(horizontal: 8,vertical: 8),
                     isScrollable: true,//قربو عن بعض
-                    tabAlignment: TabAlignment.start, //صارو عاليسار
+                    tabAlignment: TabAlignment.start,
                     dividerColor: Colors.transparent,
                     unselectedLabelColor: Colors.white,
                     indicatorColor: Colors.transparent,
@@ -120,14 +160,28 @@ class _homeState extends State<hometap> {
                     onTap: (index){
           setState(() {
             selectedIndex=index;
-
+            filterEvents();
           });
                     },
                     tabs: [
                       ...eventTitleList.map((eventName) {
-                        return tabEvent(name: eventName,
-                            isSelected:
-                            selectedIndex==eventTitleList.indexOf(eventName));
+                        return TabEvent(
+
+                          backgroundColor: AppColors.transparentColor,
+                          textSelectedStyle: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.whiteColor,
+                          ),
+                          textUnSelectedStyle: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          borderColor: AppColors.whiteColor,
+                          name: eventName,
+                          isSelected: selectedIndex == eventTitleList.indexOf(eventName),
+                        );
+
                       }).toList(),
                     ],
 
@@ -140,77 +194,168 @@ class _homeState extends State<hometap> {
           ),
 
           Expanded(
-
             child: ListView.builder(
-              padding: EdgeInsets.symmetric(horizontal: 20,vertical: 18),
-              itemCount: events.length,
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+              itemCount: filteredEventList.length,
               itemBuilder: (context, index) {
-                EventModel event = events[index];
-                return Column(
-                  children: [
-                    Text(
-                      " ${event.title}",
-                      style: TextStyle(
-                        color: Theme.of(context).appBarTheme.backgroundColor,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
+                var event = filteredEventList[index];
+
+                return Dismissible(
+                  key: UniqueKey(),
+                  secondaryBackground: Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.redColor,
+                      border: Border.all(color: AppColors.primaryLight, width: 2),
+                      borderRadius: BorderRadius.circular(25),
                     ),
-                    Container(
-                      margin: EdgeInsets.only(bottom: 20),
-                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                      height: 220,
-                      width:350,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                            image: AssetImage("assets/img/birthday.png"),
-                            fit: BoxFit.fill
-                        ),
-                        border: Border.all(
-                            color: AppColors.primaryLight,
-                            width: 2
-                        ),
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
+                    alignment: Alignment.centerLeft,
+                    margin: EdgeInsets.only(top: 25,bottom: 33),
+                    padding: EdgeInsets.symmetric(horizontal: 20),
 
-                          Container(
-                            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              color: AppColors.whiteColor,
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  event.date,
-                                  style: TextStyle(
-                                    color: AppColors.primaryLight,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-
-                              ],
-                            ),
-                          ),
-
-
-                        ],
-                      ),
+                    child: Icon(Icons.delete, color: Colors.white, size: 30),
+                  ),
+                  background: Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.yellowColor,
+                      border: Border.all(color: AppColors.primaryLight, width: 2),
+                      borderRadius: BorderRadius.circular(25),
                     ),
-                  ],
+                    alignment: Alignment.centerRight,
+                    margin: EdgeInsets.only(top: 25,bottom: 33),
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+
+                    child: Icon(Icons.edit, color: Colors.white, size: 30),
+                  ),
+                  onDismissed: (direction) async {
+                    if (direction == DismissDirection.startToEnd) {
+                      //  عند السحب من اليسار إلى اليمين
+                    // تعديل
+                      showEditDialog(context, event);
+                    } else if (direction == DismissDirection.endToStart) {
+                      //   حذف
+                      // يمين لليسار
+                      try {
+                        await firebaseUtiles.getEventCollection()
+                            .doc(event.id)
+                            .delete();
+
+                        setState(() {
+                          filteredEventList.removeAt(index);
+                          eventList.removeWhere((e) => e.id == event.id);
+                        });
+                      } catch (e) {
+                        print("Error deleting event: $e");
+                      }
+                    }
+                  },
+                  child: item_event_widget(
+                    event: EventModel(
+                      title: event.title,
+                      description: event.description,
+                      dateTime: event.dateTime,
+                      time: event.time,
+                      eventName: event.eventName,
+                        id:event.id,
+                    ),
+
+                  ),
                 );
+
               },
-
-
             ),
           ),
+
         ],
       ),
     );
   }
+  void showEditDialog(BuildContext context, EventModel event) {
+    final titleController = TextEditingController(text: event.title);
+    final descriptionController = TextEditingController(text: event.description);
+    final dateController = TextEditingController(text: DateFormat('yyyy-MM-dd').format(event.dateTime));
+    final timeController = TextEditingController(text: event.time);
+    final eventNameController = TextEditingController(text: event.eventName);
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Edit Event"),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: titleController,
+                decoration: InputDecoration(labelText: 'Title'),
+              ),
+              TextField(
+                controller: descriptionController,
+                decoration: InputDecoration(labelText: 'Description'),
+              ),
+              TextField(
+                controller: dateController,
+                decoration: InputDecoration(labelText: 'Date (yyyy-mm-dd)'),
+                keyboardType: TextInputType.datetime,
+              ),
+              TextField(
+                controller: timeController,
+                decoration: InputDecoration(labelText: 'Time'),
+                keyboardType: TextInputType.datetime,
+              ),
+              DropdownButtonFormField<String>(
+                value: eventNameController.text,
+                onChanged: (String? newValue) {
+                  setState(() {
+                    eventNameController.text = newValue!;
+                  });
+                },
+                items: ['Sport', 'Birthday', 'Gaming', 'Meeting', 'Workshop']
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                decoration: InputDecoration(labelText: 'Event Name'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () async  {
+                event.title = titleController.text;
+                event.description = descriptionController.text;
+                event.dateTime = DateFormat('yyyy-MM-dd').parse(dateController.text);
+                event.time = timeController.text;
+                event.eventName = eventNameController.text;
+
+                try {
+                  await firebaseUtiles.getEventCollection().doc(event.id).update(event.toFireStore());
+
+                  setState(() {
+                    filteredEventList[filteredEventList.indexOf(event)] = event;
+                    eventList[eventList.indexOf(event)] = event;
+                  });
+
+                  Navigator.of(context).pop();
+                } catch (e) {
+                  print("Error updating event: $e");
+                }
+              },
+              child: Text("Save"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
 }

@@ -1,32 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:new_flutter_app/core/utiles/app_colors.dart';
 
-class tabEvent extends StatelessWidget {
-  String name;
-  bool isSelected;
-  tabEvent({
+class TabEvent extends StatelessWidget {
+  final String name;
+  final bool isSelected;
+  final Color borderColor;
+  final TextStyle textSelectedStyle;
+  final TextStyle textUnSelectedStyle;
+  final Color backgroundColor;
+
+  const TabEvent({
     super.key,
     required this.name,
-    required this.isSelected
-
+    required this.isSelected,
+    required this.borderColor,
+    required this.textSelectedStyle,
+    required this.textUnSelectedStyle,
+    required this.backgroundColor,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 20,vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
       decoration: BoxDecoration(
-        color: isSelected?AppColors.whiteColor:AppColors.transparentColor,
+        color: isSelected ? backgroundColor : Colors.transparent,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: AppColors.whiteColor,
-          width: 2
-
-        )
+          color: borderColor,
+          width: 2,
+        ),
       ),
-      child: Text(name ,
-        style: TextStyle(color:
-        isSelected?Theme.of(context).appBarTheme.backgroundColor:AppColors.whiteColor,),
+      child: Text(
+        name,
+        style: isSelected ? textSelectedStyle : textUnSelectedStyle,
       ),
     );
   }
